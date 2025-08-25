@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 
 export default function ResumeForm() {
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     name: "",
     email: "",
     phone: "",
@@ -10,7 +10,9 @@ export default function ResumeForm() {
     education: [{ school: "", degree: "", year: "" }],
     experience: [{ company: "", role: "", duration: "", description: "" }],
     projects: [{ title: "", description: "", link: "" }]
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormData);
 
   // Handle single field change
   const handleChange = (e) => {
@@ -32,20 +34,24 @@ export default function ResumeForm() {
     setFormData({ ...formData, [section]: [...formData[section], emptyFields] });
   };
 
+  // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const payload = {
         ...formData,
-        skills: formData.skills.split(",").map((s) => s.trim()), // convert to array
+        skills: formData.skills.split(",").map((s) => s.trim()), // convert string to array
       };
 
       const response = await axios.post("http://localhost:5000/api/resumes", payload);
-      alert("Resume submitted successfully!");
+      alert("✅ Resume submitted successfully!");
       console.log(response.data);
+
+      // Reset form after submit
+      setFormData(initialFormData);
     } catch (err) {
       console.error(err);
-      alert("Error submitting resume");
+      alert("❌ Error submitting resume");
     }
   };
 

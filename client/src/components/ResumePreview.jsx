@@ -19,31 +19,34 @@ export default function ResumePreview() {
   }, []);
 
   // Function to download PDF
-  const downloadPDF = async (id) => {
-    const element = document.getElementById(`resume-${id}`);
-    const canvas = await html2canvas(element, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
+  // Function to download PDF
+const downloadPDF = async (id) => {
+  console.log("Download clicked for resume ID:", id);
+  const element = document.getElementById(`resume-${id}`);
+  console.log("Element found?", element);
 
-    const imgWidth = 190; // A4 width in mm (with margin)
-    const pageHeight = pdf.internal.pageSize.height;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  if (!element) {
+    alert("Resume element not found!");
+    return;
+  }
 
-    let heightLeft = imgHeight;
-    let position = 10;
+  const canvas = await html2canvas(element, { scale: 2 });
+  console.log("Canvas created:", canvas);
 
-    pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+  const imgData = canvas.toDataURL("image/png");
+  const pdf = new jsPDF("p", "mm", "a4");
 
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-    }
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    pdf.save("resume.pdf");
-  };
+  pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+  
+  pdf.save("resume.pdf");
+  
+};
+
+
+
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded mt-6">
